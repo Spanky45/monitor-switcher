@@ -1,0 +1,8 @@
+{
+  "manifest_version": 3,
+  "name": "Monitor Switcher",
+  "version": "1.0.0",
+  "description": "A browser extension that lets you move the current window to your other monitor without using keyboard shortcuts or dragging and dropping and expanding your window. One click of a button is all you need.",
+  "icons": {
+  }
+}
