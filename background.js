@@ -1,8 +1,12 @@
-// const windowInfo = chrome.windows.getCurrent();
-
-function toolbar() {
-    const windowInfo = chrome.windows.getCurrent();
-    console.log(windowInfo);
+async function getDisplayInfo() {
+    const displayInfo = await chrome.system.display.getInfo();
+    console.log(displayInfo);
 }
 
-chrome.action.onClicked.addListener(toolbar)
+async function toolbar() {
+    const windowInfo = await chrome.windows.getCurrent();
+    console.log(windowInfo);
+    await getDisplayInfo();
+}
+
+chrome.action.onClicked.addListener(toolbar);
