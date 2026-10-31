@@ -5,10 +5,20 @@ async function getDisplayInfo() {
 
 async function toolbar() {
     const windowInfo = await chrome.windows.getCurrent();
-    // console.log(windowInfo);
     const displayInfo = await getDisplayInfo();
 
-    calculateOverlapArea(windowInfo, displayInfo[0]);
+    let largestOverlap = 0;
+    let currentMonitorIndex = 0;
+
+    for (let i = 0; i < displayInfo.length; i++) {
+        const overlapArea = calculateOverlapArea(windowInfo, displayInfo[i]);
+
+        if (overlapArea > largestOverlap) {
+            largestOverlap = overlapArea;
+            currentMonitorIndex = i;
+        }
+    }
+    console.log(currentMonitorIndex);
 }
 
 chrome.action.onClicked.addListener(toolbar);
@@ -31,7 +41,7 @@ chrome.action.onClicked.addListener(toolbar);
 // const verticalOverlapEnd = Math.min(monitorBottom, windowBottom);
 // const overlapHeight = Math.max(verticalOverlapEnd - verticalOverlapStart, 0);
 
-const overlapArea = overlapHeight * overlapWidth;
+// const overlapArea = overlapHeight * overlapWidth;
 
 function calculateOverlapArea(windowInfo, monitorInfo) {
     const windowRight = windowInfo.left + windowInfo.width;
@@ -48,6 +58,6 @@ function calculateOverlapArea(windowInfo, monitorInfo) {
     const overlapHeight = Math.max(verticalOverlapEnd - verticalOverlapStart, 0);
 
     const overlapArea = overlapHeight * overlapWidth;
-    
+
     return overlapArea;
 }
