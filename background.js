@@ -19,29 +19,15 @@ async function toolbar() {
         }
     }
     console.log(currentMonitorIndex);
+
+    let nextMonitorIndex = currentMonitorIndex + 1;
+
+    if (nextMonitorIndex > displayInfo.length - 1) {
+        nextMonitorIndex = 0;
+    }
 }
 
 chrome.action.onClicked.addListener(toolbar);
-
-// const monitorLeft = 0;
-// const monitorRight = 2195;
-// const windowLeft = 1800;
-// const windowRight = 3000;
-
-// const overlapStart = Math.max(monitorLeft, windowLeft);
-// const overlapEnd = Math.min(monitorRight, windowRight);
-// const overlapWidth = Math.max(overlapEnd - overlapStart, 0);
-
-// // const monitorTop = 0;
-// // const monitorBottom = 1235;
-// // const windowTop = 800;
-// // const windowBottom = 1500;
-
-// const verticalOverlapStart = Math.max(monitorTop, windowTop);
-// const verticalOverlapEnd = Math.min(monitorBottom, windowBottom);
-// const overlapHeight = Math.max(verticalOverlapEnd - verticalOverlapStart, 0);
-
-// const overlapArea = overlapHeight * overlapWidth;
 
 function calculateOverlapArea(windowInfo, monitorInfo) {
     const windowRight = windowInfo.left + windowInfo.width;
