@@ -25,6 +25,8 @@ async function toolbar() {
     if (nextMonitorIndex > displayInfo.length - 1) {
         nextMonitorIndex = 0;
     }
+
+    const destinationMonitor = displayInfo[nextMonitorIndex];
 }
 
 chrome.action.onClicked.addListener(toolbar);
