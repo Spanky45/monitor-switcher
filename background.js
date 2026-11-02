@@ -27,6 +27,17 @@ async function toolbar() {
     }
 
     const destinationMonitor = displayInfo[nextMonitorIndex];
+
+    if (windowInfo.state === "maximized") {
+        await chrome.windows.update(windowInfo.id, { state: "normal" });
+    }
+
+    await chrome.windows.update(windowInfo.id, { 
+        left: destinationMonitor.bounds.left,
+        top: destinationMonitor.bounds.top
+    });
+
+    await chrome.windows.update(windowInfo.id, { state: "maximized" });
 }
 
 chrome.action.onClicked.addListener(toolbar);
