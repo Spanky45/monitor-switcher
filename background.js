@@ -7,53 +7,63 @@ async function getDisplayInfo() {
 
 // Main function that runs when the extension's toolbar icon is clicked.
 async function toolbar() {
-    // Get information about the current browser window and all connected monitors.
-    const windowInfo = await chrome.windows.getCurrent();
-    const displayInfo = await getDisplayInfo();
+    try {
+        // Get information about the current browser window and all connected monitors.
+        const windowInfo = await chrome.windows.getCurrent();
+        const displayInfo = await getDisplayInfo();
 
-    // Track the largest overlap area and the index of the monitor containing the window.
-    let largestOverlap = 0;
-    let currentMonitorIndex = 0;
-
-    // Loop through every connected monitor to find which one contains
-    // the largest portion of the browser window.
-    for (let i = 0; i < displayInfo.length; i++) {
-        const overlapArea = calculateOverlapArea(windowInfo, displayInfo[i]);
-
-        // If this monitor has a larger overlap, update the largest area
-        // and remember this monitor's index.
-        if (overlapArea > largestOverlap) {
-            largestOverlap = overlapArea;
-            currentMonitorIndex = i;
+        //Exit the function if fewer than two monitors are connected.
+        if (displayInfo.length < 2) {
+            return;
         }
+
+        // Track the largest overlap area and the index of the monitor containing the window.
+        let largestOverlap = 0;
+        let currentMonitorIndex = 0;
+
+        // Loop through every connected monitor to find which one contains
+        // the largest portion of the browser window.
+        for (let i = 0; i < displayInfo.length; i++) {
+            const overlapArea = calculateOverlapArea(windowInfo, displayInfo[i]);
+
+            // If this monitor has a larger overlap, update the largest area
+            // and remember this monitor's index.
+            if (overlapArea > largestOverlap) {
+                largestOverlap = overlapArea;
+                currentMonitorIndex = i;
+            }
+        }
+
+        // Select the next monitor in the array.
+        let nextMonitorIndex = currentMonitorIndex + 1;
+
+        // If the current monitor is the last one, cycle back to the first monitor.
+        if (nextMonitorIndex > displayInfo.length - 1) {
+            nextMonitorIndex = 0;
+        }
+
+        // Retrieve the monitor object for the destination monitor.
+        const destinationMonitor = displayInfo[nextMonitorIndex];
+
+        // Restore the window to its normal state if it is currently maximized.
+        // Chrome requires the window to be in its normal state before repositioning it.
+        if (windowInfo.state === "maximized") {
+            await chrome.windows.update(windowInfo.id, { state: "normal" });
+        }
+
+        // Move the browser window to the destination monitor's coordinates.
+        // Both left and top are needed to support different monitor arrangements.
+        await chrome.windows.update(windowInfo.id, { 
+            left: destinationMonitor.bounds.left,
+            top: destinationMonitor.bounds.top
+        });
+
+        // Maximize the browser window after moving it to the destination monitor.
+        await chrome.windows.update(windowInfo.id, { state: "maximized" });
+    
+    } catch (error) {
+        console.error("An error occurred:", error);
     }
-
-    // Select the next monitor in the array.
-    let nextMonitorIndex = currentMonitorIndex + 1;
-
-    // If the current monitor is the last one, cycle back to the first monitor.
-    if (nextMonitorIndex > displayInfo.length - 1) {
-        nextMonitorIndex = 0;
-    }
-
-    // Retrieve the monitor object for the destination monitor.
-    const destinationMonitor = displayInfo[nextMonitorIndex];
-
-    // Restore the window to its normal state if it is currently maximized.
-    // Chrome requires the window to be in its normal state before repositioning it.
-    if (windowInfo.state === "maximized") {
-        await chrome.windows.update(windowInfo.id, { state: "normal" });
-    }
-
-    // Move the browser window to the destination monitor's coordinates.
-    // Both left and top are needed to support different monitor arrangements.
-    await chrome.windows.update(windowInfo.id, { 
-        left: destinationMonitor.bounds.left,
-        top: destinationMonitor.bounds.top
-    });
-
-    // Maximize the browser window after moving it to the destination monitor.
-    await chrome.windows.update(windowInfo.id, { state: "maximized" });
 }
 
 // Listen for clicks on the extension's toolbar icon and execute toolbar().
